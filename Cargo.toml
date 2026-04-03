@@ -9,3 +9,4 @@ hyper-util = { version = "0.1.10", features = ["full"] }
 http-body-util = "0.1"
 bytes = "1"
 tokio = { version = "1", features = ["full"] }
+variable = "0.1.4"
