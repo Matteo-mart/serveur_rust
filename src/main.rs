@@ -1,12 +1,10 @@
-use bytes::Bytes;
-use http_body_util::Full;
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
-use hyper::{Method, Request, Response, StatusCode};
 use hyper_util::rt::TokioIo;
-use std::convert::Infallible;
-use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use std::net::SocketAddr;
+
+mod hello; 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -17,21 +15,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     loop {
         let (stream, _) = listener.accept().await?;
         let io = TokioIo::new(stream);
+        
         tokio::task::spawn(async move {
-            http1::Builder::new()
-                .serve_connection(io, service_fn(hello))
+            if let Err(err) = http1::Builder::new()
+                .serve_connection(io, service_fn(hello::hello::hello))
                 .await
-                .ok();
+            {
+                eprintln!("Erreur: {:?}", err);
+            }
         });
-    }
-}
-
-async fn hello<B>(req: Request<B>) -> Result<Response<Full<Bytes>>, Infallible> {
-    match req.method() {
-        &Method::GET => Ok(Response::new(Full::new(Bytes::from("Hello, World!")))),
-        _ => Ok(Response::builder()
-            .status(StatusCode::METHOD_NOT_ALLOWED)
-            .body(Full::new(Bytes::from("Méthode non autorisée")))
-            .unwrap()),
     }
 }

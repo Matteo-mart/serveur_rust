@@ -1,0 +1,8 @@
+GET: 
+    http://127.0.0.1:3000/
+POST: 
+    curl -X POST http://127.0.0.1:3000/
+DELETE: 
+    curl -X DELETE http://127.0.0.1:3000/
+PUT: 
+    curl -X PUT http://127.0.0.1:3000/
