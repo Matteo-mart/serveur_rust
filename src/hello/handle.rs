@@ -3,18 +3,23 @@ use http_body_util::Full;
 use hyper::{Request, Response, StatusCode, Method};
 use hyper::body::Incoming;
 
-use crate::hello::hello;
+pub fn handle_response(status: StatusCode, msg: &'static str) -> Response<Full<Bytes>> {
+    Response::builder()
+        .status(status)
+        .body(Full::new(Bytes::from(msg)))
+        .unwrap()
+}
 
 pub async fn handle_get() -> Response<Full<Bytes>> {
-    hello::handle_response(StatusCode::OK, "\nRéponse GET\n")
+    handle_response(StatusCode::OK, "\nRéponse GET\n")
 }
 
 pub async fn handle_post() -> Response<Full<Bytes>> {
-    hello::handle_response(StatusCode::OK, "\nRéponse POST\n")
+    handle_response(StatusCode::OK, "\nRéponse POST\n")
 }
 
 pub async fn handle_delete() -> Response<Full<Bytes>> {
-    hello::handle_response(StatusCode::OK, "\nRéponse DELETE\n")
+    handle_response(StatusCode::OK, "\nRéponse DELETE\n")
 }
 
 
@@ -30,7 +35,7 @@ pub async fn router(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyp
         (&Method::DELETE, "/delete") => Ok(handle_delete().await),
 
         _ => {
-            Ok(hello::handle_response(StatusCode::NOT_FOUND, "Route non trouvée"))
+            Ok(handle_response(StatusCode::NOT_FOUND, "Route non trouvée"))
         }
     }
 }
