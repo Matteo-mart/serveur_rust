@@ -3,11 +3,7 @@ use hyper::service::service_fn;
 use hyper_util::rt::TokioIo;
 
 use crate::hello::handle;
-
-mod util {
-    pub mod variable;
-}
-
+mod util;
 mod hello;
 
 #[tokio::main]
@@ -23,7 +19,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         tokio::task::spawn(async move {
             let io = TokioIo::new(stream);
             
-            // On utilise ici routes::router au lieu de hello_service
             let conn = http1::Builder::new()
                 .serve_connection(io, service_fn(|req| {
                     handle::router(req)
