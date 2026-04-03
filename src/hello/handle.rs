@@ -1,6 +1,7 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::{Response, StatusCode};
+use hyper::{Request, Response, StatusCode, Method};
+use hyper::body::Incoming;
 
 use crate::hello::hello;
 
@@ -14,4 +15,22 @@ pub async fn handle_post() -> Response<Full<Bytes>> {
 
 pub async fn handle_delete() -> Response<Full<Bytes>> {
     hello::handle_response(StatusCode::OK, "\nRéponse DELETE\n")
+}
+
+
+pub async fn router(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
+    let path = req.uri().path();
+    let method = req.method();
+
+    match (method, path) {
+        (&Method::GET, "/get") => Ok(handle_get().await),
+
+        (&Method::POST, "/post") => Ok(handle_post().await),
+
+        (&Method::DELETE, "/delete") => Ok(handle_delete().await),
+
+        _ => {
+            Ok(hello::handle_response(StatusCode::NOT_FOUND, "Route non trouvée"))
+        }
+    }
 }
